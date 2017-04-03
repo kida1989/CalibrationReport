@@ -1,0 +1,21 @@
+
+
+
+
+<script>
+  $(document).ready(function(){
+    var data =['Erick','Bryce','Joe','Taras','Geehoon'];
+    $('#myTable').append('<table></table>')
+    var t = $('#myTable').children();
+    for(i=0; i<3;i++){
+       var r = "<tr><td>"+ data[i] + "</td></tr>"
+      t.append(r)
+      t.append("<tr><td>Geehoon</td></tr>")
+    }
+    })
+</script>
+
+
+
+
+<div id="myTable"></div>
