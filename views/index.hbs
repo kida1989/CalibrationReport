@@ -1,55 +1,159 @@
-
-
-
-
 <script>
-  $(document).ready(function(){
 
+
+  $(document).ready(function(){
 
     $.ajax({
       url:'/api/locations',
       type:'GET',
       dataType:'json'
     })
-      .done(function(json){
-        $('#myTable').append("<table id ='tb'></table>")
-        var t = $('#myTable').children();
+    .done(function(json){
 
-        var k = Object.keys(json[0]);
-        console.log(k)
-        var h = "<thead><tr>";
-        var r = "<tbody>";
-        for(i=0; i<json.length;i++){
-           r += "<tr>";
-          for(j=0; j<k.length; j++){
-            if(i==0){
-                h += "<th>"+k[j]+"</th>";
-            }
-            r += "<td>" + json[i][k[j]] + "</td>"
-            console.log(json[i]);
-          }
+      var k = Object.keys(json[0]);
 
-          r += "</tr>"
-        };
-        r += "</tbody>"
-        h+="</tr></thead>"
-        t.append(h)
-        t.append(r)
-        $('#tb').DataTable({
-        "order":[[3,"desc"]]  
+      var tableArray =[];
+      $("#myTable").append("<tfoot id='tfooter'></tfoot>");
+       var footColumns = $("#myTable").children();
+       var fname = "<td></td>" ;
+      for(i=0; i < 5; i++){
+        fname += "<td>" + k[i] + "</td>";
+        var tableObject = new Object();
+        tableObject.data=k[i];
+        tableObject.title=k[i];
+        console.log(tableObject)
+        tableArray[i] = tableObject;
+      };
+
+
+      tableArray.unshift({
+
+            className:      'details-control',
+
+            orderable:      false,
+
+            data:           null,
+
+            defaultContent: ''
+
         });
+
+      console.log(footColumns);
+
+
+      var table = $('#myTable').DataTable( {
+
+      
+      ajax: {
+          url: '/api/locations',
+          dataSrc: ''
+
+      },
+
+      columns:tableArray,
+      "order":[[4,"desc"]]
+
+
+      } );
+
+      footColumns.append(fname)
+
+      $('#myTable tbody').on('click', 'td.details-control', function () {
+
+        var tr = $(this).closest('tr');
+
+        var row = table.row( tr );
+
+        if ( row.child.isShown() ) {
+
+            row.child.hide();
+
+            tr.removeClass('shown');
+
+        }
+
+        else {
+
+            row.child( format(row.data()) ).show();
+
+            tr.addClass('shown');
+
+        }
+
       });
 
+      function format ( rowData ) {
+        var div = $('<div/>')
+        .addClass( 'loading' )
+        .text( 'Loading...' );
+
+        $.ajax( {
+          url: '/api/calibration',
+          tupe: 'GET',
+          data: {
+            locationid: rowData.LocationId
+        },
+        dataType: 'json',
+        success: function ( json ) {
+          console.log(json[0].Name)
+            div
+                .html("<a href='location?locationid=" +json[0].LocationId + "'>" + json[0].Name + "</a>")
+                .removeClass( 'loading' );
+        }
+    } );
+
+    return div;
+}
+
+    })
 
 
 
-  })
+
+
+
+
+
+})
+
 
 
 
 </script>
 
+<style type="text/css">
 
 
 
-<div id="myTable"></div>
+td.details-control {
+	background: url('/images/details_open.png') no-repeat center center;
+	cursor: pointer;
+}
+
+tr.shown td.details-control {
+	background: url('/images/details_close.png') no-repeat center center;
+}
+
+div.loading {
+	text-align: center;
+}
+
+#content {
+  width: 90%;
+  margin: 0 auto;
+
+}
+
+#tfooter td {
+  margin:auto;
+  text-align: center;
+  font-weight: bold;
+}
+
+
+
+</style>
+
+<div id='content'>
+  <table id='myTable'></table>
+</div>

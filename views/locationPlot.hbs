@@ -1,0 +1,105 @@
+
+
+
+<script>
+
+$(document).ready(function(){
+  var HPXDelta = [];
+  var HPYDelta = [];
+  var HPZDelta = [];
+  var RPXDelta = [];
+  var RPYDelta = [];
+  var RPZDelta = [];
+
+  $.urlParam = function(name){
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    return results[1] || 0;
+  }
+
+  var locationid = $.urlParam('locationid');
+
+
+  $.ajax({
+    url:'/api/deltas',
+    type:'GET',
+    data: {
+      locationid: locationid
+    },
+    dataType:'json',
+  })
+  .done( function(data) {
+  	$.each(data, function(key, value){
+
+  		HPXDelta.push({x: new Date(value["DateModified"]), y: value["HPXDelta"]});
+      HPYDelta.push({x: new Date(value["DateModified"]), y: value["HPYDelta"]});
+      HPZDelta.push({x: new Date(value["DateModified"]), y: value["HPZDelta"]});
+      RPXDelta.push({x: new Date(value["DateModified"]), y: value["RPXDelta"]});
+      RPYDelta.push({x: new Date(value["DateModified"]), y: value["RPYDelta"]});
+      RPZDelta.push({x: new Date(value["DateModified"]), y: value["RPZDelta"]});
+
+  	});
+  	var chart = new CanvasJS.Chart("chartContainer",{
+      zoomEnabled:true,
+      exportEnabled: true,
+
+  		title:{
+  			text:data[0].Name
+  		},
+  		data: [{
+  			type: "spline",
+        showInLegend:true,
+        legendText:"HomePositionX",
+  			dataPoints : HPXDelta
+  		},
+      {
+        type: "spline",
+        showInLegend:true,
+        legendText:"HomePositionY",
+        dataPoints : HPYDelta
+      },
+      {
+        type: "spline",
+        showInLegend:true,
+        legendText:"HomePositionZ",
+        dataPoints : HPZDelta
+      },
+      {
+        type: "spline",
+        showInLegend:true,
+        legendText:"RubberPositionX",
+        dataPoints : RPXDelta
+      },
+      {
+        type: "spline",
+        showInLegend:true,
+        legendText:"RubberPositionY",
+        dataPoints : RPYDelta
+      },
+      {
+        type: "spline",
+        showInLegend:true,
+        legendText:"RubberPositionZ",
+        dataPoints : RPZDelta
+      },
+    ]
+  	});
+  	chart.render();
+
+  })
+
+
+
+
+
+
+
+
+})
+
+
+
+
+</script>
+
+
+<div id="chartContainer" style="height: 300px; width: 100%;"></div>

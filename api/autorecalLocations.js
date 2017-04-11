@@ -9,9 +9,9 @@ router.get('/locations', function(req, res, next) {
 
   const config = {
 
-        user: 'tmadmin',
+        user: 'ereyes',
 
-        password: 'TrackMan123',
+        password: '5aBPxtX71bEs2',
 
         server: 'kmqed1sonq.database.windows.net',
 
@@ -33,7 +33,7 @@ router.get('/locations', function(req, res, next) {
       request.stream = true // You can set streaming differently for each request
       //request.query('select TOP 5 calibrationclass, CalibrationId from dbo.calibration ') // or request.execute(procedure)
 
-      request.query(`select l.Name, c1.LocationId, c1.DateCreated, c1.DateModified, Round(c1.RubberPositionX,3) as RubberPositionX, Round(c1.RubberPositionY,3) as RubberPositionY, Round(c1.RubberPositionZ,3) as RubberPositionZ, Round(c1.HomePositionX,3) as HomePositionX, Round(c1.HomePositionY,3) as HomePositionY, Round(c1.HomePositionZ,3) as HomePositionZ, c1.CalibrationId, Round(c1.FixedRadarTilt,3) as FixedRadarTilt, Round(c1.FixedRadarRoll,3) as FixedRadarRoll, c1.CalibrationClass, l.SoftwareVersion
+      request.query(`select l.Name, c1.LocationId, c1.DateCreated, c1.DateModified, c1.CalibrationId, Round(c1.RubberPositionX,3) as RubberPositionX, Round(c1.RubberPositionY,3) as RubberPositionY, Round(c1.RubberPositionZ,3) as RubberPositionZ, Round(c1.HomePositionX,3) as HomePositionX, Round(c1.HomePositionY,3) as HomePositionY, Round(c1.HomePositionZ,3) as HomePositionZ, Round(c1.FixedRadarTilt,3) as FixedRadarTilt, Round(c1.FixedRadarRoll,3) as FixedRadarRoll, c1.CalibrationClass, l.SoftwareVersion
       from calibration c1
       inner join
               (select min(datecreated) as datecreated, min(datemodified) as datemodified, locationID from calibration
