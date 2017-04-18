@@ -5,13 +5,18 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+// Routes Require //
+
 var index = require('./routes/index');
 var users = require('./routes/users');
 var test = require('./routes/test');
-var locationPlot = require('./routes/locationPlot')
+var locationPlot = require('./routes/locationPlot');
+var mlbamReport = require('./routes/mlbamReport')
+
+// API Require //
 var autorecalLocations = require('./api/autorecalLocations');
 var Calibration = require('./api/Calibration');
-
+var mlbamAPI = require ('./api/mlbamAPI');
 var app = express();
 
 // view engine setup
@@ -31,9 +36,11 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/test', test);
 app.use('/location',locationPlot);
+app.use('/mlbamReport', mlbamReport);
 
 app.use('/api',autorecalLocations);
 app.use('/api',Calibration);
+app.use('/api',mlbamAPI);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

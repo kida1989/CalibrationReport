@@ -11,12 +11,15 @@
     .done(function(json){
 
       var k = Object.keys(json[0]);
-
       var tableArray =[];
+
       $("#myTable").append("<tfoot id='tfooter'></tfoot>");
+
        var footColumns = $("#myTable").children();
+
        var fname = "<td></td>" ;
-      for(i=0; i < 5; i++){
+
+       for(i=0; i < 5; i++){
         fname += "<td>" + k[i] + "</td>";
         var tableObject = new Object();
         tableObject.data=k[i];
@@ -24,7 +27,6 @@
         console.log(tableObject)
         tableArray[i] = tableObject;
       };
-
 
       tableArray.unshift({
 
@@ -38,23 +40,22 @@
 
         });
 
-      console.log(footColumns);
-
 
       var table = $('#myTable').DataTable( {
 
-      
-      ajax: {
+
+        ajax: {
           url: '/api/locations',
           dataSrc: ''
 
-      },
+        },
 
-      columns:tableArray,
-      "order":[[4,"desc"]]
+        columns:tableArray,
+        "order":[[4,"desc"]],
+        "lengthMenu" : [[20, 40, 60, -1], [20, 40, 60, "All"]]
 
 
-      } );
+      });
 
       footColumns.append(fname)
 
@@ -82,6 +83,7 @@
 
       });
 
+
       function format ( rowData ) {
         var div = $('<div/>')
         .addClass( 'loading' )
@@ -92,34 +94,28 @@
           tupe: 'GET',
           data: {
             locationid: rowData.LocationId
-        },
+          },
         dataType: 'json',
         success: function ( json ) {
-          console.log(json[0].Name)
+
             div
                 .html("<a href='location?locationid=" +json[0].LocationId + "'>" + json[0].Name + "</a>")
                 .removeClass( 'loading' );
         }
-    } );
+      });
 
     return div;
-}
+    }
 
     })
 
-
-
-
-
-
-
-
-})
+  })
 
 
 
 
 </script>
+
 
 <style type="text/css">
 

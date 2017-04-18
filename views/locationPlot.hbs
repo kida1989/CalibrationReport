@@ -4,102 +4,179 @@
 <script>
 
 $(document).ready(function(){
-  var HPXDelta = [];
-  var HPYDelta = [];
-  var HPZDelta = [];
-  var RPXDelta = [];
-  var RPYDelta = [];
-  var RPZDelta = [];
+
+  drawPlot = function (locationid,start_date,end_date) {
+
+
+    var HPXDelta = [];
+    var HPYDelta = [];
+    var HPZDelta = [];
+    var RPXDelta = [];
+    var RPYDelta = [];
+    var RPZDelta = [];
+        $.ajax({
+              url:'/api/deltas',
+              type:'GET',
+              data: {
+                locationid: locationid,
+                start_date: start_date,
+                end_date:end_date,
+              },
+              dataType:'json',
+            })
+          .done( function(data) {
+              $.each(data, function(key, value){
+
+                HPXDelta.push({x: new Date(value["DateModified"]), y: value["HPXDelta"]});
+                HPYDelta.push({x: new Date(value["DateModified"]), y: value["HPYDelta"]});
+                HPZDelta.push({x: new Date(value["DateModified"]), y: value["HPZDelta"]});
+                RPXDelta.push({x: new Date(value["DateModified"]), y: value["RPXDelta"]});
+                RPYDelta.push({x: new Date(value["DateModified"]), y: value["RPYDelta"]});
+                RPZDelta.push({x: new Date(value["DateModified"]), y: value["RPZDelta"]});
+
+              });
+              var chart = new CanvasJS.Chart("chartContainer",{
+                zoomEnabled:true,
+                exportEnabled: true,
+
+                title:{
+                  text:data[0].Name
+                },
+
+
+                data: [{
+                  type: "spline",
+                  showInLegend:true,
+                  legendText:"HomePositionX",
+                  dataPoints : HPXDelta
+                },
+                {
+                  type: "spline",
+                  showInLegend:true,
+                  legendText:"HomePositionY",
+                  dataPoints : HPYDelta
+                },
+                {
+                  type: "spline",
+                  showInLegend:true,
+                  legendText:"HomePositionZ",
+                  dataPoints : HPZDelta
+                },
+                {
+                  type: "spline",
+                  showInLegend:true,
+                  legendText:"RubberPositionX",
+                  dataPoints : RPXDelta
+                },
+                {
+                  type: "spline",
+                  showInLegend:true,
+                  legendText:"RubberPositionY",
+                  dataPoints : RPYDelta
+                },
+                {
+                  type: "spline",
+                  showInLegend:true,
+                  legendText:"RubberPositionZ",
+                  dataPoints : RPZDelta
+                },
+              ]
+              });
+              chart.render();
+              console.log()
+
+
+            })
+
+  }
 
   $.urlParam = function(name){
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
     return results[1] || 0;
   }
 
+  limitPicker = function(locationid){
+    $.ajax({
+          url:'/api/deltas',
+          type:'GET',
+          data: {
+            locationid: locationid,
+
+          },
+          dataType:'json',
+        })
+        .done( function(data) {
+          var max = new Date(data[data.length-1].DateModified);
+          var min = new Date(data[0].DateModified);
+
+          $('input[id="datepicker"]').daterangepicker({
+          startDate : min,
+          EndDate : max,
+          minDate : min,
+          maxDate : max
+
+          });
+        })
+    }
+
+
+
+
   var locationid = $.urlParam('locationid');
+  limitPicker(locationid)
+  drawPlot(locationid);
 
 
-  $.ajax({
-    url:'/api/deltas',
-    type:'GET',
-    data: {
-      locationid: locationid
-    },
-    dataType:'json',
-  })
-  .done( function(data) {
-  	$.each(data, function(key, value){
 
-  		HPXDelta.push({x: new Date(value["DateModified"]), y: value["HPXDelta"]});
-      HPYDelta.push({x: new Date(value["DateModified"]), y: value["HPYDelta"]});
-      HPZDelta.push({x: new Date(value["DateModified"]), y: value["HPZDelta"]});
-      RPXDelta.push({x: new Date(value["DateModified"]), y: value["RPXDelta"]});
-      RPYDelta.push({x: new Date(value["DateModified"]), y: value["RPYDelta"]});
-      RPZDelta.push({x: new Date(value["DateModified"]), y: value["RPZDelta"]});
+  $('#datepicker').on('apply.daterangepicker', function(ev, picker) {
+    start_date = picker.startDate.format('YYYY-MM-DD');
+    end_date = picker.endDate.format('YYYY-MM-DD');
+    drawPlot(locationid,start_date,end_date)
+  });
 
-  	});
-  	var chart = new CanvasJS.Chart("chartContainer",{
-      zoomEnabled:true,
-      exportEnabled: true,
+  $('input[type="checkbox"]').change(function(){
 
-  		title:{
-  			text:data[0].Name
-  		},
-  		data: [{
-  			type: "spline",
-        showInLegend:true,
-        legendText:"HomePositionX",
-  			dataPoints : HPXDelta
-  		},
-      {
-        type: "spline",
-        showInLegend:true,
-        legendText:"HomePositionY",
-        dataPoints : HPYDelta
-      },
-      {
-        type: "spline",
-        showInLegend:true,
-        legendText:"HomePositionZ",
-        dataPoints : HPZDelta
-      },
-      {
-        type: "spline",
-        showInLegend:true,
-        legendText:"RubberPositionX",
-        dataPoints : RPXDelta
-      },
-      {
-        type: "spline",
-        showInLegend:true,
-        legendText:"RubberPositionY",
-        dataPoints : RPYDelta
-      },
-      {
-        type: "spline",
-        showInLegend:true,
-        legendText:"RubberPositionZ",
-        dataPoints : RPZDelta
-      },
-    ]
-  	});
-  	chart.render();
+      var name = $(this).val();
+      var check = $(this).prop('checked');
+
+      console.log("Change: " + name + " to " + check);
+
 
   })
 
 
+});
 
 
 
 
 
 
-})
+
 
 
 
 
 </script>
 
+<style trype="text/css">
 
-<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+  #navigation {
+    border:  5px blue solid;
+    width: 100%;
+    height: 100px;
+  }
+  
+  .canvasjs-chart-credit {
+   display: none;
+}
+
+</style>
+
+<div id="navigation" >
+  Date : <input type="text" id="datepicker">
+  <a id = 'back' href='/'> HOME  </a>
+  In Game:<input type = "checkbox"  id = "duringGame" value='In Game' > </input>
+</div>
+
+<div id="chartContainer" style="height: 350px; width: 100%;"></div>

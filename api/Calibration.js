@@ -86,19 +86,29 @@ module.exports = router;
 router.get('/deltas', function(req, res){
 
    var locationid = req.query.locationid;
+   var start_date = " " ;
+
+   var end_date = " 2017-04-17";
+   if (req.query.start_date !== undefined){
+     start_date =  req.query.start_date;}
+   if (req.query.end_date !== undefined){
+     end_date = req.query.end_date;}
+   console.log(start_date)
+   console.log(end_date)
 
    var data = [];
 
    var querystring =
+
     `select jk.Name, jk.LocationID, jk.DateModified, jk.CalibrationID, jk.SoftwareVersion, jk.OEMVersion,
-	  dbo.MtoIn(isnull(jk.RubberPositionX - lag(jk.RubberPositionX) over (order by jk.datemodified), 0)) as RPXDelta,
-	  dbo.MtoIn(isnull(jk.RubberPositionY - lag(jk.RubberPositionY) over (order by jk.datemodified), 0)) as RPYDelta,
-	  dbo.MtoIn(isnull(jk.RubberPositionZ - lag(jk.RubberPositionZ) over (order by jk.datemodified), 0)) as RPZDelta,
-	  dbo.MtoIn(isnull(jk.HomePositionX - lag(jk.HomePositionX) over (order by jk.datemodified), 0)) as HPXDelta,
-	  dbo.MtoIn(isnull(jk.HomePositionY - lag(jk.HomePositionY) over (order by jk.datemodified), 0)) as HPYDelta,
-	  dbo.MtoIn(isnull(jk.HomePositionZ - lag(jk.HomePositionZ) over (order by jk.datemodified), 0)) as HPZDelta,
-	  isnull(jk.FixedRadarTilt - lag(jk.FixedRadarTilt) over (order by jk.datemodified), 0) as TiltDelta,
-	  isnull(jk.FixedRadarRoll - lag(jk.FixedRadarRoll) over (order by jk.datemodified), 0) as RollDelta
+    dbo.MtoIn(isnull(jk.RubberPositionX - lag(jk.RubberPositionX) over (order by jk.datemodified), 0)) as RPXDelta,
+    dbo.MtoIn(isnull(jk.RubberPositionY - lag(jk.RubberPositionY) over (order by jk.datemodified), 0)) as RPYDelta,
+    dbo.MtoIn(isnull(jk.RubberPositionZ - lag(jk.RubberPositionZ) over (order by jk.datemodified), 0)) as RPZDelta,
+    dbo.MtoIn(isnull(jk.HomePositionX - lag(jk.HomePositionX) over (order by jk.datemodified), 0)) as HPXDelta,
+    dbo.MtoIn(isnull(jk.HomePositionY - lag(jk.HomePositionY) over (order by jk.datemodified), 0)) as HPYDelta,
+    dbo.MtoIn(isnull(jk.HomePositionZ - lag(jk.HomePositionZ) over (order by jk.datemodified), 0)) as HPZDelta,
+    isnull(jk.FixedRadarTilt - lag(jk.FixedRadarTilt) over (order by jk.datemodified), 0) as TiltDelta,
+    isnull(jk.FixedRadarRoll - lag(jk.FixedRadarRoll) over (order by jk.datemodified), 0) as RollDelta
     from
     (
     select l.Name, c1.LocationId, c1.DateCreated, c1.DateModified, Round(c1.RubberPositionX,3) as RubberPositionX,
@@ -106,11 +116,14 @@ router.get('/deltas', function(req, res){
       Round(c1.HomePositionX,3) as HomePositionX, Round(c1.HomePositionY,3) as HomePositionY, Round(c1.HomePositionZ,3) as HomePositionZ, c1.CalibrationId,
       Round(degrees(c1.FixedRadarTilt),3) as FixedRadarTilt, Round(degrees(c1.FixedRadarRoll),3) as FixedRadarRoll, c1.CalibrationClass, l.SoftwareVersion, l.OEMVersion
       from calibration c1
-	    inner join location l
-		  on l.locationID = c1.locationID and c1.calibrationclass = 'AutoRecalibration' and year(c1.datemodified) = '2017'
+      inner join location l
+      on l.locationID = c1.locationID and c1.calibrationclass = 'AutoRecalibration' and c1.datemodified >= '`+start_date+`' and c1.datemodified < '`+end_date+`'
       where c1.LocationId = '`+locationid+`'
     ) jk
     order by jk.datemodified`
+
+
+
 
    sql.connect(config, err => {
        // ... error checks

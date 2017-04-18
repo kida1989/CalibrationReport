@@ -1,0 +1,62 @@
+<script>
+
+$().ready(function(){
+
+  $.ajax({
+    url:'/api/mlbam',
+    type:'GET',
+    dataType:'json'
+  })
+  .done(function(json){
+
+    var k = Object.keys(json[0]);
+    var tableArray =[];
+
+    $("#myTable").append("<tfoot id='tfooter'></tfoot>");
+
+     var footColumns = $("#myTable").children();
+
+     var fname = "<td></td>" ;
+
+     for(i=0; i < k.length; i++){
+      fname += "<td>" + k[i] + "</td>";
+      var tableObject = new Object();
+      tableObject.data=k[i];
+      tableObject.title=k[i];
+      console.log(tableObject)
+      tableArray[i] = tableObject;
+    };
+
+
+
+
+    var table = $('#myTable').DataTable( {
+
+
+      ajax: {
+        url: '/api/mlbam',
+        dataSrc: ''
+
+      },
+
+      columns:tableArray,
+      "order":[[4,"desc"]],
+      "lengthMenu" : [[20, 40, 60, -1], [20, 40, 60, "All"]]
+
+
+    });
+
+    footColumns.append(fname)
+  })
+})
+
+
+
+</script>
+
+
+
+
+
+<div> test </div>
+  <table id='myTable'></table>
