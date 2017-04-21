@@ -5,7 +5,10 @@
 
 $(document).ready(function(){
 
-  drawPlot = function (locationid,start_date,end_date) {
+
+
+  drawPlot = function (locationid,checkBox,start_date,end_date) {
+
 
 
     var HPXDelta = [];
@@ -35,6 +38,7 @@ $(document).ready(function(){
                 RPZDelta.push({x: new Date(value["DateModified"]), y: value["RPZDelta"]});
 
               });
+
               var chart = new CanvasJS.Chart("chartContainer",{
                 zoomEnabled:true,
                 exportEnabled: true,
@@ -83,12 +87,61 @@ $(document).ready(function(){
               ]
               });
               chart.render();
-              console.log()
+
+
+
+
+                for(i=0; i< chart.data.length;i++){
+                    if ( chart.data[i].legendText == checkBox[i].id && checkBox[i].check == false) {
+
+
+                      chart.data[i].set('visible', false);
+                      console.log('this is a test')
+
+                    }
+
+                    if (chart.data[i].legendText == checkBox[i].id && checkBox[i].check == true){
+
+                      chart.data[i].set('visible', true)
+                    }
+
+                }
+
+
+              $('input[type=checkbox]').change(function(){
+
+                              var name = $(this).val();
+                              var check = $(this).prop('checked');
+                              var checkbox_id = $(this).attr('id');
+
+                              console.log("Change: " + name + " to " + check);
+
+
+                              for(i=0; i<chart.data.length;i++){
+                                    if ( chart.data[i].legendText == checkbox_id && check == false) {
+
+
+                                      chart.data[i].set('visible', false);
+
+                                    }
+
+                                    if (chart.data[i].legendText == checkbox_id && check == true){
+
+                                      chart.data[i].set('visible', true)
+                                    }
+
+                                }
+                  })
+
+
+
+
 
 
             })
 
   }
+
 
   $.urlParam = function(name){
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -122,30 +175,37 @@ $(document).ready(function(){
 
 
 
+
   var locationid = $.urlParam('locationid');
+
   limitPicker(locationid)
-  drawPlot(locationid);
+
+  var cb_array = [];
+  check = $("input[type=checkbox]").each(function(){
+    cb_array.push({'id':$(this).attr('id'), 'check':$(this).prop('checked')});
+
+  })
+  drawPlot(locationid,cb_array);
 
 
 
   $('#datepicker').on('apply.daterangepicker', function(ev, picker) {
     start_date = picker.startDate.format('YYYY-MM-DD');
     end_date = picker.endDate.format('YYYY-MM-DD');
-    drawPlot(locationid,start_date,end_date)
+    var cb_array = [];
+
+    check = $("input[type=checkbox]").each(function(){
+      cb_array.push({'id':$(this).attr('id'), 'check':$(this).prop('checked')});
+
+    })
+
+
+    drawPlot(locationid,cb_array,start_date,end_date)
+    });
+
+
+
   });
-
-  $('input[type="checkbox"]').change(function(){
-
-      var name = $(this).val();
-      var check = $(this).prop('checked');
-
-      console.log("Change: " + name + " to " + check);
-
-
-  })
-
-
-});
 
 
 
@@ -166,7 +226,7 @@ $(document).ready(function(){
     width: 100%;
     height: 100px;
   }
-  
+
   .canvasjs-chart-credit {
    display: none;
 }
@@ -176,7 +236,16 @@ $(document).ready(function(){
 <div id="navigation" >
   Date : <input type="text" id="datepicker">
   <a id = 'back' href='/'> HOME  </a>
-  In Game:<input type = "checkbox"  id = "duringGame" value='In Game' > </input>
+
 </div>
 
 <div id="chartContainer" style="height: 350px; width: 100%;"></div>
+
+<div id="options">
+HPXDelta<input type = "checkbox" id="HomePositionX" value= 'HPXDelta_cb' checked ></input>
+HPYDelta<input type = "checkbox" id="HomePositionY" checked></input>
+HPZDelta<input type = "checkbox" id="HomePositionZ" checked></input>
+RPXDelta<input type = "checkbox" id="RubberPositionX" checked></input>
+RPYDelta<input type = "checkbox" id="RubberPositionY" checked></input>
+RPZDelta<input type = "checkbox" id="RubberPositionZ" checked></input>
+ </div>

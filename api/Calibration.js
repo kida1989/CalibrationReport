@@ -28,10 +28,10 @@ router.get('/calibration', function(req, res){
 
    var querystring =
     `select`+top1switch+`l.Name, c1.LocationId, c1.DateCreated, c1.DateModified,
-      dbo.MtoIn(Round(c1.RubberPositionX,3)) as RubberPositionX,
-      dbo.MtoIn(Round(c1.RubberPositionY,3)) as RubberPositionY, dbo.MtoIn(Round(c1.RubberPositionZ,3)) as RubberPositionZ,
-      dbo.MtoIn(Round(c1.HomePositionX,3)) as HomePositionX,
-      dbo.MtoIn(Round(c1.HomePositionY,3)) as HomePositionY, dbo.MtoIn(Round(c1.HomePositionZ,3)) as HomePositionZ, c1.CalibrationId,
+      dbo.MtoFt(Round(c1.RubberPositionX,3)) as RubberPositionX,
+      dbo.MtoFt(Round(c1.RubberPositionY,3)) as RubberPositionY, dbo.MtoFt(Round(c1.RubberPositionZ,3)) as RubberPositionZ,
+      dbo.MtoFt(Round(c1.HomePositionX,3)) as HomePositionX,
+      dbo.MtoFt(Round(c1.HomePositionY,3)) as HomePositionY, dbo.MtoFt(Round(c1.HomePositionZ,3)) as HomePositionZ, c1.CalibrationId,
       Round(degrees(c1.FixedRadarTilt),3) as FixedRadarTilt, Round(degrees(c1.FixedRadarRoll),3) as FixedRadarRoll,
       c1.CalibrationClass, l.SoftwareVersion, l.OEMVersion
       from calibration c1

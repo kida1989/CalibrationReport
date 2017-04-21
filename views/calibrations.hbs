@@ -1,7 +1,6 @@
 
 
 
-
 <script>
 
 $(document).ready(function(){
@@ -12,14 +11,14 @@ $(document).ready(function(){
 
 
 
-    var HPXDelta = [];
-    var HPYDelta = [];
-    var HPZDelta = [];
-    var RPXDelta = [];
-    var RPYDelta = [];
-    var RPZDelta = [];
+    var HPX = [];
+    var HPY = [];
+    var HPZ = [];
+    var RPX = [];
+    var RPY = [];
+    var RPZ = [];
         $.ajax({
-              url:'/api/deltas',
+              url:'/api/calibration',
               type:'GET',
               data: {
                 locationid: locationid,
@@ -31,12 +30,12 @@ $(document).ready(function(){
           .done( function(data) {
               $.each(data, function(key, value){
 
-                HPXDelta.push({x: new Date(value["DateModified"]), y: value["HPXDelta"]});
-                HPYDelta.push({x: new Date(value["DateModified"]), y: value["HPYDelta"]});
-                HPZDelta.push({x: new Date(value["DateModified"]), y: value["HPZDelta"]});
-                RPXDelta.push({x: new Date(value["DateModified"]), y: value["RPXDelta"]});
-                RPYDelta.push({x: new Date(value["DateModified"]), y: value["RPYDelta"]});
-                RPZDelta.push({x: new Date(value["DateModified"]), y: value["RPZDelta"]});
+                HPX.push({x: new Date(value["DateModified"]), y: value["HomePositionX"]});
+                HPY.push({x: new Date(value["DateModified"]), y: value["HomePositionY"]});
+                HPZ.push({x: new Date(value["DateModified"]), y: value["HomePositionZ"]});
+                RPX.push({x: new Date(value["DateModified"]), y: value["RubberPositionX"]});
+                RPY.push({x: new Date(value["DateModified"]), y: value["RubberPositionY"]});
+                RPZ.push({x: new Date(value["DateModified"]), y: value["RubberPositionZ"]});
 
               });
 
@@ -50,45 +49,44 @@ $(document).ready(function(){
 
 
                 data: [{
-                  type: "spline",
+                  type: "line",
                   showInLegend:true,
                   legendText:"HomePositionX",
-                  dataPoints : HPXDelta
+                  dataPoints : HPX
                 },
                 {
-                  type: "spline",
+                  type: "line",
                   showInLegend:true,
                   legendText:"HomePositionY",
-                  dataPoints : HPYDelta
+                  dataPoints : HPY
                 },
                 {
-                  type: "spline",
+                  type: "line",
                   showInLegend:true,
                   legendText:"HomePositionZ",
-                  dataPoints : HPZDelta
+                  dataPoints : HPZ
                 },
                 {
-                  type: "spline",
+                  type: "line",
                   showInLegend:true,
                   legendText:"RubberPositionX",
-                  dataPoints : RPXDelta
+                  dataPoints : RPX
                 },
                 {
-                  type: "spline",
+                  type: "line",
                   showInLegend:true,
                   legendText:"RubberPositionY",
-                  dataPoints : RPYDelta
+                  dataPoints : RPY
                 },
                 {
-                  type: "spline",
+                  type: "line",
                   showInLegend:true,
                   legendText:"RubberPositionZ",
-                  dataPoints : RPZDelta
+                  dataPoints : RPZ
                 },
               ]
               });
               chart.render();
-
 
 
 
@@ -141,6 +139,7 @@ $(document).ready(function(){
 
             })
 
+
   }
 
 
@@ -151,7 +150,7 @@ $(document).ready(function(){
 
   limitPicker = function(locationid){
     $.ajax({
-          url:'/api/deltas',
+          url:'/api/calibration',
           type:'GET',
           data: {
             locationid: locationid,
@@ -220,79 +219,33 @@ $(document).ready(function(){
 
 </script>
 
-<style>
+<style trype="text/css">
 
-.sidenav {
-  height:100%;
-  background: green;
+  #navigation {
+    border:  5px blue solid;
+    width: 100%;
+    height: 100px;
+  }
+
+  .canvasjs-chart-credit {
+   display: none;
 }
-
-#chartContainer {
-  height:90%;
-  width: 100%;
-  margin-top: 2%;
-
-  background: yellow;
-}
-
 
 </style>
 
-<nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="#">WebSiteName</a>
-    </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Home</a></li>
-        <li><a href="#">Page 1</a></li>
-        <li><a href="#">Page 2</a></li>
-        <li><a href="#">Page 3</a></li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-        <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-
-<div class="container-fluid" style="background-color:red;  ">
-  <div class = "row content" style="background-color:blue; height:500px">
-
-      <div class = "col-md-2 sidenav" >
-
-          <div id="navigation" >
-            Date : <input type="text" id="datepicker">
-            <a id = 'back' href='/'> HOME  </a>
-
-          </div>
-
-          <div id="options">
-            HPXDelta<input type = "checkbox" id="HomePositionX" value= 'HPXDelta_cb' checked ></input>
-            HPYDelta<input type = "checkbox" id="HomePositionY" checked></input>
-            HPZDelta<input type = "checkbox" id="HomePositionZ" checked></input>
-            RPXDelta<input type = "checkbox" id="RubberPositionX" checked></input>
-            RPYDelta<input type = "checkbox" id="RubberPositionY" checked></input>
-            RPZDelta<input type = "checkbox" id="RubberPositionZ" checked></input>
-           </div>
-
-
-    </div>
-
-    <div class = " col-md-10" style="background-color:purple">
-
-      <div c id="chartContainer"  ><h1>test</h1></div>
-
-    </div>
-</div>
-
+<div id="navigation" >
+  Date : <input type="text" id="datepicker">
+  <a id = 'back' href='/'> HOME  </a>
 
 </div>
+
+<div id="chartContainer" style="height: 350px; width: 100%;"></div>
+
+<div id="options">
+HPXDelta<input type = "checkbox" id="HomePositionX" value= 'HPXDelta_cb' checked ></input>
+HPYDelta<input type = "checkbox" id="HomePositionY" checked></input>
+HPZDelta<input type = "checkbox" id="HomePositionZ" checked></input>
+RPXDelta<input type = "checkbox" id="RubberPositionX" checked></input>
+RPYDelta<input type = "checkbox" id="RubberPositionY" checked></input>
+RPZDelta<input type = "checkbox" id="RubberPositionZ" checked></input>
+ </div>

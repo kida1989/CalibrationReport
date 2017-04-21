@@ -99,7 +99,8 @@
         success: function ( json ) {
 
             div
-                .html("<a href='location?locationid=" +json[0].LocationId + "'>" + json[0].Name + "</a>")
+                .html("<a href='location/delta?locationid=" +json[0].LocationId + "'>" + json[0].Name + "</a>"+
+                "<h1><a href= 'location/calibrations?locationid=" +json[0].LocationId + "'>" + json[0].Name+"te</a></h1>")
                 .removeClass( 'loading' );
         }
       });
@@ -134,9 +135,15 @@ div.loading {
 	text-align: center;
 }
 
+
+
 #content {
   width: 90%;
-  margin: 0 auto;
+
+
+  background: yellow;
+  left:5%;
+  position: absolute;
 
 }
 
@@ -146,9 +153,31 @@ div.loading {
   font-weight: bold;
 }
 
+#menu{
+  background-color: red;
+  width: 90%;
+  height: 50px;
+  border: solid 1px black;
+  top:0;
+  left:5%;
+  position: absolute;
+}
 
+a {
+  background: pink;
+}
 
 </style>
+
+
+<nav id = "menu">
+  <a>Home</a>
+  <a>Calibrations</a>
+  <a>test3</a>
+  <a>test4</a>
+  <a>test5</a>
+
+</nav>
 
 <div id='content'>
   <table id='myTable'></table>
