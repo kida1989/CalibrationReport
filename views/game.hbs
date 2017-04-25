@@ -1,0 +1,547 @@
+
+
+
+
+<script>
+
+  $(document).ready(function(){
+
+
+
+  drawPlot = function (locationid,checkBox,start_date,end_date) {
+
+
+
+    var HPXDelta = [];
+    var HPYDelta = [];
+    var HPZDelta = [];
+    var RPXDelta = [];
+    var RPYDelta = [];
+    var RPZDelta = [];
+        $.ajax({
+              url:'/api/game',
+              type:'GET',
+              data: {
+                locationid: locationid,
+                start_date: start_date,
+                end_date:end_date,
+              },
+              dataType:'json',
+            })
+          .done( function(data) {
+              $.each(data, function(key, value){
+
+                HPXDelta.push({x: new Date(value["DateModified"]), y: value["HPXDelta"]});
+                HPYDelta.push({x: new Date(value["DateModified"]), y: value["HPYDelta"]});
+                HPZDelta.push({x: new Date(value["DateModified"]), y: value["HPZDelta"]});
+                RPXDelta.push({x: new Date(value["DateModified"]), y: value["RPXDelta"]});
+                RPYDelta.push({x: new Date(value["DateModified"]), y: value["RPYDelta"]});
+                RPZDelta.push({x: new Date(value["DateModified"]), y: value["RPZDelta"]});
+
+              });
+
+              var chart = new CanvasJS.Chart("chartContainer",{
+                zoomEnabled:true,
+                exportEnabled: true,
+                backgroundColor: null,
+
+                title:{
+                  text:data[0].Name
+                },
+
+
+                data: [{
+                  type: "spline",
+                  showInLegend:true,
+                  legendText:"HomePositionX",
+                  dataPoints : HPXDelta
+                },
+                {
+                  type: "spline",
+                  showInLegend:true,
+                  legendText:"HomePositionY",
+                  dataPoints : HPYDelta
+                },
+                {
+                  type: "spline",
+                  showInLegend:true,
+                  legendText:"HomePositionZ",
+                  dataPoints : HPZDelta
+                },
+                {
+                  type: "spline",
+                  showInLegend:true,
+                  legendText:"RubberPositionX",
+                  dataPoints : RPXDelta
+                },
+                {
+                  type: "spline",
+                  showInLegend:true,
+                  legendText:"RubberPositionY",
+                  dataPoints : RPYDelta
+                },
+                {
+                  type: "spline",
+                  showInLegend:true,
+                  legendText:"RubberPositionZ",
+                  dataPoints : RPZDelta
+                },
+              ]
+              });
+              chart.render();
+
+
+
+
+                for(i=0; i< chart.data.length;i++){
+                    if ( chart.data[i].legendText == checkBox[i].id && checkBox[i].check == false) {
+
+
+                      chart.data[i].set('visible', false);
+                      console.log('this is a test')
+
+                    }
+
+                    if (chart.data[i].legendText == checkBox[i].id && checkBox[i].check == true){
+
+                      chart.data[i].set('visible', true)
+                    }
+
+                }
+
+
+              $('input[type=checkbox]').change(function(){
+
+                              var name = $(this).val();
+                              var check = $(this).prop('checked');
+                              var checkbox_id = $(this).attr('id');
+
+                              console.log("Change: " + name + " to " + check);
+
+
+                              for(i=0; i<chart.data.length;i++){
+                                    if ( chart.data[i].legendText == checkbox_id && check == false) {
+
+
+                                      chart.data[i].set('visible', false);
+
+                                    }
+
+                                    if (chart.data[i].legendText == checkbox_id && check == true){
+
+                                      chart.data[i].set('visible', true)
+                                    }
+
+                                }
+                  })
+
+
+
+
+
+
+            })
+
+  }
+
+
+  $.urlParam = function(name){
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    return results[1] || 0;
+  }
+
+  limitPicker = function(locationid){
+    $.ajax({
+          url:'/api/game',
+          type:'GET',
+          data: {
+            locationid: locationid,
+
+          },
+          dataType:'json',
+        })
+        .done( function(data) {
+          var max = new Date(data[data.length-1].DateModified);
+          var min = new Date(data[0].DateModified);
+
+          $('input[id="datepicker"]').daterangepicker({
+          startDate : min,
+          EndDate : max,
+          minDate : min,
+          maxDate : max
+
+          });
+        })
+    }
+
+
+
+
+
+  var locationid = $.urlParam('locationid');
+
+  limitPicker(locationid)
+
+  var cb_array = [];
+  check = $("input[type=checkbox]").each(function(){
+    cb_array.push({'id':$(this).attr('id'), 'check':$(this).prop('checked')});
+
+  })
+  drawPlot(locationid,cb_array);
+
+
+
+  $('#datepicker').on('apply.daterangepicker', function(ev, picker) {
+    start_date = picker.startDate.format('YYYY-MM-DD');
+    end_date = picker.endDate.format('YYYY-MM-DD');
+    var cb_array = [];
+
+    check = $("input[type=checkbox]").each(function(){
+      cb_array.push({'id':$(this).attr('id'), 'check':$(this).prop('checked')});
+
+    })
+
+
+    drawPlot(locationid,cb_array,start_date,end_date)
+    });
+
+
+    $.ajax({
+      url:'/api/game?locationid='+locationid,
+      type:'GET',
+      dataType:'json'
+    })
+    .done(function(json){
+
+      var results = {};
+      var HPXTotal = 0;
+      var HPYTotal = 0;
+      var HPZTotal = 0;
+      var RPXTotal = 0;
+      var RPYTotal = 0;
+      var RPZTotal = 0;
+
+
+      for(i=0;i<json.length;i++){
+        if (json[i].HPXDelta > 1 || json[i].HPXDelta < -1){
+          HPXTotal += 1;
+          }
+          results.hpx = HPXTotal
+        if (json[i].HPYDelta > 1 || json[i].HPYDelta < -1){
+            HPYTotal += 1;
+            }
+            results.hpy = HPYTotal
+        if (json[i].HPZDelta > 1 || json[i].HPZDelta < -1){
+              HPZTotal += 1;
+              }
+              results.hpz = HPZTotal
+        if (json[i].RPXDelta > 1 || json[i].RPXDelta < -1){
+          RPXTotal += 1;
+          }
+          results.rpx = RPXTotal
+        if (json[i].RPYDelta > 1 || json[i].RPYDelta < -1){
+            RPYTotal += 1;
+            }
+            results.rpy = RPYTotal
+        if (json[i].RPZDelta > 1 || json[i].RPZDelta < -1){
+              RPZTotal += 1;
+              }
+              results.rpz = RPZTotal
+      }
+      console.log(results)
+
+      var k = Object.keys(json[0]);
+      var tableArray =[];
+
+      $("#myTable").append("<tfoot id='tfooter'></tfoot>");
+
+       var footColumns = $("#myTable").children();
+
+       var fname = "<td></td>" ;
+
+       for(i=0; i < k.length; i++){
+        fname += "<td>" + k[i] + "</td>";
+        var tableObject = new Object();
+
+        tableObject.data=k[i];
+        tableObject.title=k[i];
+
+        tableArray[i] = tableObject;
+      };
+
+      tableArray.unshift({
+
+            className:      'details-control',
+
+            orderable:      false,
+
+            data:           null,
+
+            defaultContent: ''
+
+        });
+
+        console.log(tableArray)
+
+      var table = $('#myTable').DataTable( {
+
+
+        ajax: {
+          url: '/api/game?locationid='+locationid,
+          dataSrc: ''
+
+        },
+
+        columns:tableArray,
+        "order":[[4,"desc"]],
+        "lengthMenu" : [[20, 40, 60, -1], [20, 40, 60, "All"]]
+
+
+      });
+
+      footColumns.append(fname)
+
+      $('#myTable tbody').on('click', 'td.details-control', function () {
+
+        var tr = $(this).closest('tr');
+
+        var row = table.row( tr );
+
+        if ( row.child.isShown() ) {
+
+            row.child.hide();
+
+            tr.removeClass('shown');
+
+        }
+
+        else {
+
+            row.child( format(row.data()) ).show();
+
+            tr.addClass('shown');
+
+        }
+
+      });
+
+
+      function format ( rowData ) {
+        var div = $('<div/>')
+        .addClass( 'loading' )
+        .text( 'Loading...' );
+
+        $.ajax( {
+          url: '/api/game?locationid='+locationid,
+          tupe: 'GET',
+          data: {
+            locationid: rowData.LocationId
+          },
+        dataType: 'json',
+        success: function ( json ) {
+
+            div
+                .html("<a href='location/delta?locationid=" +json[0].LocationId + "'>" + json[0].Name + "</a>"+
+                "<h1><a href= 'location/calibrations?locationid=" +json[0].LocationId + "'>" + json[0].Name+"te</a></h1>")
+                .removeClass( 'loading' );
+        }
+      });
+
+    return div;
+    }
+
+    })
+
+
+});
+
+
+</script>
+
+<style>
+
+.topnav {
+
+  background: purple;
+
+}
+
+#chartContainer {
+  height:90%;
+  width: 100%;
+  margin-top: 2%;
+
+  background: yellow;
+}
+
+.content {
+  height:500px;
+}
+
+
+
+.deltaButtons1 label{
+  margin: 10px;
+  left: 10%;
+
+
+
+}
+
+.deltaButtons1{
+  background: pink;
+
+}
+
+.deltaButtons2 label{
+  margin: 10px;
+  left: 10%;
+
+
+
+}
+
+.deltaButtons2{
+  background: yellow;
+
+}
+
+.input-group{
+  width: 70%;
+  left:10%;
+  margin-top: -20px !important;
+}
+
+.datePicker{
+
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+</style>
+
+<nav class="navbar navbar-inverse">
+
+  <div class="container-fluid">
+
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/" >Auto Recalibration</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="myNavbar">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#">Deltas</a></li>
+          <li><a href="#">Calibration</a></li>
+
+        </ul>
+        <ul class="nav navbar-nav navbar-right" style="margin-top:8px">
+          <li style="background-color:pink">
+            <input type="text" class="form-control " placeholder="Search" id="txtSearch" >
+          </li>
+          <li>
+              <button class="btn btn-primary" type="submit">
+
+                <span class="glyphicon glyphicon-search"></span>
+
+              </button>
+            </li>
+        </ul>
+      </div>
+  </div>
+</nav>
+
+
+<div class="container-fluid"  >
+
+  <div class="row test"  >
+
+    <div class="col-md-3  datePicker ">
+      <label class="control-label"></label>
+
+      <div class="input-group">
+
+          <span class="input-group-addon" id="start-date"><span class="glyphicon glyphicon-calendar"></span></span>
+          <input class='form-control ' type="text" id="datepicker">
+      </div>
+
+
+
+
+    </div>
+
+  </div>
+
+  <div class = "row content" >
+
+      <div class = " col-md-12" style="background-color:purple height:100%">
+
+        <div c id="chartContainer"  ><h1>test</h1></div>
+
+      </div>
+  </div>
+
+  <div class="row">
+
+    <div class = "col-md-6 col-md-offset-3 topnav" >
+
+        <div class='row' >
+
+            <div class="btn-group btn-group-sm col-md-6 deltaButtons1" id="options" data-toggle="buttons">
+
+              <label class="btn btn-primary active">
+                  HPXDelta   <span class="badge">ON</span>
+                  <input type = "checkbox" id="HomePositionX" value= 'HPXDelta_cb' checked ></input>
+              </label>
+
+              <label class= "btn btn-primary">
+                HPYDelta   <span class="badge">ON</span>
+                <input type = "checkbox" id="HomePositionY" checked></input>
+              </label>
+
+              <label class= "btn btn-primary">
+                HPZDelta   <span class="badge">ON</span>
+              <input type = "checkbox" id="HomePositionZ" checked></input>
+              </label>
+            </div>
+
+            <div class="btn-group btn-group-sm col-md-6  deltaButtons2" id="options" data-toggle="buttons">
+
+              <label class= "btn btn-primary">
+                RPXDelta   <span class="badge">ON</span>
+                <input type = "checkbox" id="RubberPositionX" checked></input>
+              </label>
+
+              <label class= "btn btn-primary">
+                RPYDelta   <span class="badge">ON</span>
+                <input type = "checkbox" id="RubberPositionY" checked></input>
+              </label>
+
+              <label class= "btn btn-primary">
+                RPZDelta   <span class="badge">ON</span>
+                <input type = "checkbox" id="RubberPositionZ" checked></input>
+
+              </label>
+
+            </div>
+
+        </div>
+
+
+
+      </div>
+
+  </div>
+
+
+</div>
+
+</div>
+
+<div id='content'>
+  <table id='myTable'></table>
+</div>

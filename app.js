@@ -9,7 +9,7 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
-var test = require('./routes/test');
+var game = require('./routes/game');
 var locationPlot = require('./routes/locationPlot');
 var mlbamReport = require('./routes/mlbamReport')
 
@@ -34,7 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
-app.use('/test', test);
+app.use('/game', game);
 app.use('/location',locationPlot);
 app.use('/mlbamReport', mlbamReport);
 

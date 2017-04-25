@@ -5,7 +5,7 @@ var sql = require ('mssql');
 /* GET home page. */
 router.get('/', function(req, res, next) {
   var locationid = req.query.locationid;
-  res.render('test')
+  res.render('game')
 })
 
 
