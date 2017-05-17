@@ -104,14 +104,22 @@ router.get('/deltas', function(req, res){
      start_date =  req.query.start_date;}
    if (req.query.end_date !== undefined){
      end_date = req.query.end_date;}
-  var end_date = moment().format('YYYY-MM-DD');
+  var end_date = moment().utc().format('YYYY-MM-DD');
 
-      runQuery.getDeltas_sql(locationid,start_date,end_date).then((resolve)=>{
-      res.status(200).json(resolve)
-    }).catch(()=>{
-      console.log('error!')
-    })
+
+  runQuery.getDeltas_sql(locationid,start_date,end_date).then((values)=>{
+
+    res.status(200).json(values)
+
+
+  }).catch(()=>{
+    console.log("SOMETHING IS WRONG")
+  })
+
+
 });
+
+
 router.get('/gametime', function(req, res){
 
 
@@ -141,7 +149,7 @@ router.get('/gametime', function(req, res){
 router.get('/game',function(req,res){
 
    var locationid = req.query.locationid.toLowerCase();
-   var start_date = "2017-01-01" ;
+   var start_date = "" ;
 
 
 
@@ -149,27 +157,41 @@ router.get('/game',function(req,res){
      start_date =  req.query.start_date;}
    if (req.query.end_date !== undefined){
      end_date = req.query.end_date;}
-  var end_date = moment().format('YYYY-MM-DD');
+  var end_date = moment().utc().format('YYYY-MM-DD');
+    console.log(end_date)
    Promise.all([runQuery.getDeltas_sql(locationid,start_date,end_date),runQuery.getPitchTimes_mongo(locationid,start_date,end_date)]).then((values)=>{
 
      var data = [];
+     console.log(values[0].length)
+     console.log(values[1].length)
+
      values[1].forEach((game,i)=>{
 
        values[0].forEach((cal,j)=>{
 
 
-         if(cal.DateModified > game.firstPitch && cal.DateModified <= game.lastPitch){
-           cal.InGame = game.GameReference;
 
-           data.push(cal)
+           if(cal.DateModified > game.firstPitch && cal.DateModified <= game.lastPitch){
+             cal.InGame = game.GameReference;
 
-         }
+             data.push(cal)
+
+           }
+
+
+
+
+
+
+
+
+
 
        })
 
 
      })
-
+     console.log(data.length)
      res.status(200).json(data);
 
 

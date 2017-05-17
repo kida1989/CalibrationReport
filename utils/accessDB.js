@@ -22,7 +22,7 @@ const config = {
 
 
 var getDeltas_sql = (locationid,start_date, end_date) => {
-  console.log(start_date)
+
   return new Promise((resolve,reject)=>{
 
     var data = [];
@@ -78,8 +78,7 @@ var getDeltas_sql = (locationid,start_date, end_date) => {
         });
 
         request.on('done', result => {
-         // Always emitted as the last one
-         console.log("By Calibration API call was success");
+
 
          resolve(data);
          sql.close();
@@ -148,32 +147,49 @@ var getPitchTimes_mongo = (locationid,start_date, end_date)=>{
 // }).catch((msg)=>{
 //   console.log(msg)
 // })
-
+//
 // getPitchTimes_mongo('951c7099-f93c-4609-8680-d5e89e26309c','2017-01-01','2017-04-11').then((res)=>{
 //   console.log(res)
 // }).catch(()=>{
 //   console.log("something is wrong")
 // })
 
-//
+
+
+
 // Promise.all([getDeltas_sql('951c7099-f93c-4609-8680-d5e89e26309c','2017-01-01','2017-04-17'),getPitchTimes_mongo('951c7099-f93c-4609-8680-d5e89e26309c','2017-01-01','2017-04-17')]).then((values)=>{
 //   var data = [];
-//   values[1].forEach((game,i)=>{
+//   console.log(values[0].length)
+//   console.log(values[1].length)
+//
+//   //values[1].forEach((game,i)=>{
 //
 //     values[0].forEach((cal,j)=>{
 //
 //
-//       if(cal.DateModified >= game.firstPitch){
-//         cal.InGame = game.GameReference;
-//       }else{
-//         cal.InGame = null;
-//         data.push(cal)
-//       }
-//     })
+//
+//
+//         if(cal.DateModified > game.firstPitch && cal.DateModified <= game.lastPitch){
+//           cal.InGame = game.GameReference;
+//           data.push(cal)
+//
+//
+//         }
+//
+//
+//
+//
+//
+//
+//      })
 //
 //
 //   })
-//   console.log(data)
+//
+//
+//
+//   console.log(data.length)
+//   console.log(JSON.stringify(data))
 //
 //
 // }).catch(()=>{
